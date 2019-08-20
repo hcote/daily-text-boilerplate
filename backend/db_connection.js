@@ -25,7 +25,7 @@ client.connect( (err) => {
 
 === HELPFUL POSTGRES COMMANDS GETTING STARTED ===
 $ createdb new_database_name
-$ psql database_name => to enter postgres console
+$ psql -d database_name >>> to enter postgres console
 # \dt => to see tables in database
 # \l => to see all databases (and owner of db)
 # SELECT * FROM users; => to see all active users
@@ -35,7 +35,9 @@ $ psql database_name => to enter postgres console
  id serial PRIMARY KEY,
  email TEXT UNIQUE NOT NULL,
  password TEXT NOT NULL,
- created_on TIMESTAMP NOT NULL
+ created_on TIMESTAMP NOT NULL,
+ text_time TIMESTAMP,
+ active_sub BOOL DEFAULT false
 );
 
  */

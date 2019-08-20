@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 });
 
 // =======REGISTER==========
-app.post('/api/signup', (req, res) => {
+app.post('/api/register', (req, res) => {
   console.log(req.body);
   
   // ensure both fields are filled out

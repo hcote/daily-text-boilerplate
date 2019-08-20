@@ -1,0 +1,2 @@
+is_admin is defaulting to undefined instead of false, which when you run JSON.parse(is_admin) 
+  it throws an error and the site crashes. need to fix.

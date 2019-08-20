@@ -3,7 +3,7 @@ import axios from 'axios';
 const state = {
     status: '',
     token: localStorage.getItem('token') || '',
-    is_admin: JSON.parse(localStorage.getItem('is_admin')) || false,
+    is_admin: false,
 };
 
 const getters = {
@@ -45,6 +45,8 @@ const actions = {
                 localStorage.setItem('token', token);
                 localStorage.setItem('is_admin', JSON.stringify(is_admin))
                 commit('auth_success', token, is_admin)
+                // eslint-disable-next-line
+                // console.log(JSON.parse(localStorage.getItem('is_admin')))
                 resolve(res)
             })
             .catch(err => {

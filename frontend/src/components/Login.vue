@@ -11,8 +11,6 @@
         <!-- but it also loads the register component at /register -->
         <router-view></router-view>
 
-        <!-- uncomment line below for get request example date to show -->
-        <!-- <p>API data: {{user}}</p> -->
     </div>
 </template>
 
@@ -34,22 +32,10 @@ export default {
         }
     },
 
-    // ===== EXAMPLE OF A GET REQUEST =====
-    // mounted(){
-    //    axios({ method: "GET", "url": "http://localhost:3000/api/user/4"})
-    //     .then(result => {
-    //         this.user = result.data.user.email;
-    //     }, error => {
-    //         /* eslint-disable */
-    //         console.error(error);
-    //     });
-    // },
-
     methods: {
         login() {
             let email = this.input.email
             let password = this.input.password
-            // let password = this.password 
             this.$store.dispatch('login', { email, password })
                 .then(() => this.$router.push('/'))
                 // eslint-disable-next-line

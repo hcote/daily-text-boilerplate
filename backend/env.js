@@ -1,4 +1,4 @@
 module.exports = { 
-    username: "huntercote",
-    db_name: "happyendings"
+    username: "",
+    db_name: "text"
  };
