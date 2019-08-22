@@ -2,9 +2,7 @@ import Vue from 'vue'
 import Nav from './components/Nav.vue'
 import router from './components/router'
 import store from './store/index.js'
-import axios from 'axios'
 
-Vue.use(axios)
 Vue.config.productionTip = false
 
 new Vue({

@@ -4,6 +4,8 @@
     <p>Subscription: {{sub}}</p>
     <p>Member Since: {{created_on}}</p>
     <button>Change password</button>
+    <button>Change time texts are sent</button>
+    <button>Change email</button>
     </div>
 </template>
 
@@ -21,14 +23,16 @@ export default {
         }
     },
      mounted(){
-       axios({ method: "GET", "url": "http://localhost:3000/api/user/4"})
-        .then(result => {
-            this.user = result.data.user.email;
-            this.sub = result.data.user.active_sub;
-            this.created_on = result.data.user.created_on;
-        }, error => {
-            /* eslint-disable */
-            console.error(error);
+        const token = localStorage.getItem('token');
+        console.log(token)
+        axios({ method: "GET", "url": "http://localhost:3000/api/profile", headers: {token: token}})
+            .then(result => {
+                this.user = result.data.user.email;
+                this.sub = result.data.user.active_sub;
+                this.created_on = result.data.user.created_on;
+            }, error => {
+                /* eslint-disable */
+                console.error(error);
         });
     },
 }

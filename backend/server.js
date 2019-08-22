@@ -38,25 +38,25 @@ app.post('/api/register', (req, res) => {
   const hashPassword = helper.hashPassword(req.body.password);
 
   const createQuery = `INSERT INTO
-    users(email, password, created_on)
-    VALUES($1, $2, $3)
+    users(email, password, created_on, jwt)
+    VALUES($1, $2, $3, $4)
     returning *`;
-
+  const token = helper.generateToken(req.body.email);
   const today = new Date();
   const values = [
     // generate unqiue universal identifier (user id)
     // nextval('id'),
     req.body.email,
     hashPassword,
-    today
+    today,
+    token,
   ];
   console.log(values);
 
   const rows = db.client.query(createQuery, values, (err, result) => {
     if (err) {
       console.log(err);
-    } else {      
-      const token = helper.generateToken(result.rows[0].id);
+    } else {
       return res.json({"message": "new user registered!",
       "result": result.rows[0],
       token
@@ -65,16 +65,10 @@ app.post('/api/register', (req, res) => {
   });
 });
 
-// =======GET USER==========
-app.get('/api/user/:id', (req, res) => {
-  const userId = req.params.id;
-  const text = 'SELECT * FROM users WHERE id = $1';
-  const rows = db.client.query(text, [userId], (err, result) => {
-    return res.json({
-      user: result.rows[0]
-    });
-  });
-});
+// {
+// 	"email": "abc@gmail.com",
+// 	"password": "1"
+// }
 
 // =======LOGIN==========
 app.post('/api/login', (req, res) => {
@@ -90,26 +84,44 @@ app.post('/api/login', (req, res) => {
   }
   const text = 'SELECT * FROM users WHERE email = $1';
   const rows = db.client.query(text, [req.body.email], (err, result) => {
+    const token = helper.generateToken(req.body.email);
     if (!result.rows[0].email) {
       return res.status(403).send({'message': 'username or password is invalid'});
     }
-
+    
     if(!helper.comparePassword(req.body.password, result.rows[0].password)) {
       return res.status(403).send({ 'message': 'password is invalid' });
     }
-    const token = helper.generateToken(result.rows[0].id);
-    return res.json({
-      "message": "user logged in",
-      user: result.rows[0],
-      token
+    db.client.query('UPDATE users SET jwt = $1 WHERE email = $2', [token, req.body.email], (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(403).send({'message': 'error updating user'});
+      } else {
+        return res.json({
+          "message": "user logged in",
+          user: result.rows[0],
+          token
+        });
+      }
     }); 
+  });
+});
+
+// =======GET USER==========
+app.get('/api/profile', (req, res) => {
+  const token = req.headers.token;
+  const text = 'SELECT * FROM users WHERE jwt = $1';
+  const rows = db.client.query(text, [token], (err, result) => {
+    console.log(result.rows)
+    return res.json({
+      user: result.rows[0]
+    });
   });
 });
 
 // =======UPDATE USER==========
 app.put('/api/user/:id', (req, res) => {
   const userId = req.params.id;
-
   // ensure email is in a valid format i.e. john@gmail.com
   if (!helper.isValidEmail(req.body.email)) {
     return res.sendStatus(403).send({'message': 'invalid email'});
@@ -124,6 +136,11 @@ app.put('/api/user/:id', (req, res) => {
     }
   });
 });
+
+// {
+// 	"email": "hc@gmail.com",
+// 	"id": 1
+// }
 
 // =======DELETE USER==========
 app.delete('/api/user/:id', function(req, res) {
@@ -142,6 +159,36 @@ app.delete('/api/user/:id', function(req, res) {
       }
   });
 });
+
+// =======SUBSCRIBE==========
+app.post('/api/subscribe', (req, res) => {
+  // ensure both fields are filled out
+  if (!req.body.time || !req.body.number) {
+    return res.json({'message': 'phone number and time to receive text are required'});
+  }
+
+  const text = 'UPDATE users SET text_time = $1, phone_number = $2, active_sub = true WHERE id = 1';
+
+  const values = [
+    req.body.time,
+    req.body.number,
+  ];
+  console.log(values);
+
+  const rows = db.client.query(text, values, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.status(403).send({'message': 'error updating subscription'});
+    } else {
+      return res.json({"message": "subscription successfully set"})
+    }
+  });
+});
+
+// {
+// 	"number": "1231231234",
+// 	"time": "12:00"
+// }
 
 // =======SET SERVER==========
 app.listen(process.env.PORT || 3000, function() {

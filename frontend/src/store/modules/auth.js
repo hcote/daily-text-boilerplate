@@ -21,7 +21,7 @@ const actions = {
                 const token = res.data.token
                 const is_admin = res.data.is_admin
                 localStorage.setItem('token', token)
-                localStorage.setItem('is_admin', JSON.stringify(is_admin))
+                localStorage.setItem('is_admin', JSON.stringify(this.state.is_admin))
                 axios.defaults.headers.common['Authorization'] = token
                 commit('auth_success', token, is_admin)
                 resolve(res)
@@ -41,6 +41,7 @@ const actions = {
             axios({ method: "POST", "url": "http://localhost:3000/api/login", "data": credentials, "headers": { "content-type": "application/json" } })
             .then(res => {
                 const token = res.data.token;
+                console.log(token);
                 const is_admin = res.data.is_admin;
                 localStorage.setItem('token', token);
                 localStorage.setItem('is_admin', JSON.stringify(is_admin))
